@@ -1,0 +1,116 @@
+apply plugin: 'java'
+apply plugin: 'project-report'
+
+
+apply plugin: 'jacoco'
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.com.palantir:jacoco-coverage:0.4.0"
+    }
+}
+
+apply plugin: "com.palantir.jacoco-coverage"
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination "${buildDir}/reports/jacocoHtml"
+    }
+}
+
+jacoco {
+    toolVersion = "0.7.8"
+}
+
+jacocoCoverage {
+    reportThreshold 1.0
+    packageThreshold 1.0
+    classThreshold 1.0
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    all*.exclude group: 'ch.qos.logback', module: 'logback-classic'
+    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+}
+
+dependencies {
+    def springVersion = '4.3.3.RELEASE'
+    def springGroup = 'org.springframework'
+    def springBootGroup = 'org.springframework.boot'
+    def springBootVersion = '1.4.1.RELEASE'
+    def log4jVersion = '2.6.2'
+
+    //Spring dependencies..
+    compile(group: springGroup, name: 'spring-web', version: springVersion)
+    compile(group: springBootGroup, name: 'spring-boot-starter-aop', version: springBootVersion)
+
+    compile(group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2')
+    compile(group: 'com.google.guava', name: 'guava', version: '18.0')
+    compile(group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0')
+    compile(group: 'org.projectlombok', name: 'lombok', version: '1.16.12')
+    compile(group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: log4jVersion)
+    compile(group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.25')
+    compile(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.4.4')
+    compile(group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.4')
+    compile(group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion)
+
+    testCompile(group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: log4jVersion)
+    testCompile (group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: log4jVersion)
+    testCompile(group: springGroup, name: 'spring-test', version: springVersion)
+    testCompile(group: springGroup, name: 'spring-webmvc', version: springVersion)
+    testCompile(group: 'junit', name: 'junit', version: '4.12')
+    testCompile(group: 'org.apache.directory.studio', name: 'org.apache.commons.io', version: '2.4')
+    testCompile(group: springBootGroup, name: 'spring-boot-starter-test', version: springBootVersion)
+}
+
+jacocoCoverage{
+
+    reportThreshold 0.89, BRANCH
+    reportThreshold 0.88, COMPLEXITY
+    reportThreshold 0.98, INSTRUCTION
+    reportThreshold 0.99, LINE
+
+    packageThreshold 0.91, BRANCH, 'com/bs/abc/filter'
+    packageThreshold 0.89, COMPLEXITY, 'com/bs/abc/filter'
+    packageThreshold 0.98, INSTRUCTION, 'com/bs/abc/filter'
+    packageThreshold 0.99, LINE, 'com/bs/abc/filter'
+    classThreshold 0.90, BRANCH, 'com/bs/abc/filter/LoggingFilter'
+    classThreshold 0.87, COMPLEXITY, 'com/bs/abc/filter/LoggingFilter'
+    classThreshold 0.97, INSTRUCTION, 'com/bs/abc/filter/LoggingFilter'
+    classThreshold 0.99, LINE, 'com/bs/abc/filter/LoggingFilter'
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/layout/**',
+                    '**/model/**',
+                    '**/utilities/**',
+                    '**/utility/**',
+                    '**/aspect/**',
+                    '**/config/**'
+            ])
+        })
+    }
+}
+
+jar {
+    baseName = 'abc-logging'
+    version = {currentVersion}
+}

@@ -1,0 +1,15 @@
+/CWL_Logging.iml
+/"logs
+/logs
+/.idea
+/build/
+/out
+.gradle/
+/bin/
+.project
+.classpath
+.settings/
+.gradle-app.setting
+/gradle-app.setting
+/test-bin/
+.DS_Store
